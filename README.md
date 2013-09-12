@@ -26,14 +26,12 @@ Also has proper support for:
 
 Gradle
 ----
-RoundedImageView is available on [Ark](https://github.com/ark/ark).
+RoundedImageView is available on Maven Central as well as [Ark](https://github.com/ark/ark).
 
 Add the following to your `build.gradle` to use:
 ```
 repositories {
-    maven {
-        url 'https://raw.github.com/ark/ark/master/releases/'
-    }
+    mavenCentral()
 }
 
 dependencies {
@@ -60,27 +58,27 @@ mvn android:deploy android:run
 If you want to use the library, add this dependency:
 ```
 <dependency>
-    <groupId>com.makeramen.rounded</groupId>
-    <artifactId>library</artifactId>
-    <version>0.1</version>
+    <groupId>com.makeramen</groupId>
+    <artifactId>roundedimageview-apklib</artifactId>
+    <version>1.0.0</version>
     <type>apklib</type>
 </dependency>
 ```
 
-Use Library
+Usage
 ----
 Define in xml:
 
 ```xml
 <com.makeramen.RoundedImageView
-        xmlns:makeramen="http://schemas.android.com/apk/res/com.makeramen.rounded.RoundedImageView"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/imageView1"
         android:src="@drawable/photo1"
         android:scaleType="centerCrop"
-        makeramen:corner_radius="30dip"
-        makeramen:border="2dip"
-        makeramen:border_color="#333333"
-        makeramen:round_background="true" />
+        app:corner_radius="30dip"
+        app:border_width="2dip"
+        app:border_color="#333333"
+        app:round_background="true" />
 ```
 
 Or in code:
@@ -100,3 +98,7 @@ Known Issues
 --------------------------------------
 * Programmatically setting attributes with TransitionDrawables not yet supported.
 * Only tested support for BitmapDrawables and TransitionDrawables (with BitmapDrawables in them). Other types might work but may have unexpected behavior.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/vinc3m1/roundedimageview/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
