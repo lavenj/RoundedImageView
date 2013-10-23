@@ -8,12 +8,16 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import java.util.EnumSet;
+
 public class RoundedImageView extends ImageView {
 
 	public static final String TAG = "RoundedImageView";
 
 	public static final int DEFAULT_RADIUS = 0;
 	public static final int DEFAULT_BORDER = 0;
+
+	private EnumSet<RoundedDrawable.Corners> mRoundCorners = EnumSet.of(RoundedDrawable.Corners.ALL);
 
 	private int mCornerRadius;
 	private int mBorderWidth;
@@ -191,6 +195,7 @@ public class RoundedImageView extends ImageView {
 		drawable.setBorderWidth(mBorderWidth);
 		drawable.setBorderColors(mBorderColor);
 		drawable.setOval(mOval);
+		drawable.setRoundCorners(mRoundCorners);
 	}
 
 	@Override
@@ -315,4 +320,19 @@ public class RoundedImageView extends ImageView {
 
 		invalidate();
 	}
+
+	public EnumSet<RoundedDrawable.Corners> getRoundCorners() {
+		return mRoundCorners;
+	}
+
+	public void setRoundCorners(EnumSet<RoundedDrawable.Corners> roundCorners) {
+		this.mRoundCorners = roundCorners;
+		if (mDrawable instanceof RoundedDrawable) {
+			((RoundedDrawable) mDrawable).setRoundCorners(roundCorners);
+		}
+		if (mRoundBackground && mBackgroundDrawable instanceof RoundedDrawable) {
+			((RoundedDrawable) mBackgroundDrawable).setRoundCorners(roundCorners);
+		}
+	}
+
 }

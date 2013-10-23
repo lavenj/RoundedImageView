@@ -10,10 +10,31 @@ import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
 import android.widget.ImageView.ScaleType;
 
+import java.util.EnumSet;
+
 public class RoundedDrawable extends Drawable {
 	public static final String TAG = "RoundedDrawable";
 
 	public static final int DEFAULT_BORDER_COLOR = Color.BLACK;
+
+	public enum Corners {
+		ALL,
+		TOP_LEFT,
+		TOP_RIGHT,
+		BOTTOM_RIGHT,
+		BOTTOM_LEFT,
+		NONE
+	};
+
+	public EnumSet<Corners> getRoundCorners() {
+		return mRoundCorners;
+	}
+
+	public void setRoundCorners(EnumSet<Corners> roundCorners) {
+		this.mRoundCorners = roundCorners;
+	}
+
+	private EnumSet<Corners> mRoundCorners = EnumSet.of(Corners.ALL);
 
 	private final RectF mBounds = new RectF();
 
@@ -203,47 +224,109 @@ public class RoundedDrawable extends Drawable {
 		if (mOval) {
 			if (mBorderWidth > 0) {
 				canvas.drawOval(mBorderRect, mBorderPaint);
-				canvas.drawOval(mDrawableRect, mBitmapPaint);
-			} else {
-				canvas.drawOval(mDrawableRect, mBitmapPaint);
 			}
-		} else {
-			if (mBorderWidth > 0) {
-
-//				canvas.drawRoundRect(mBorderRect, mCornerRadius, mCornerRadius, mBorderPaint);
-				Path path = new Path();
-				mCornerRadius = 80;
-				//path.addRect(arcOval, Path.Direction.CW);
-//				path.addArc(arcOval, 180, -90);
-
-				float diameter = mCornerRadius*2;
-
-				path.moveTo(mDrawableRect.left, mDrawableRect.top+ diameter/2);
-				path.lineTo(mDrawableRect.left, mDrawableRect.bottom - diameter);
-				RectF arcOval = new RectF(mDrawableRect.left, mDrawableRect.bottom- diameter, mDrawableRect.left+ diameter, mDrawableRect.bottom);
-				path.arcTo(arcOval, 180, -90);
-				path.lineTo(mDrawableRect.right - diameter, mDrawableRect.bottom);
-				arcOval = new RectF(mDrawableRect.right- diameter, mDrawableRect.bottom- diameter, mDrawableRect.right, mDrawableRect.bottom);
-				path.arcTo(arcOval, 90, -90);
-				path.lineTo(mDrawableRect.right, mDrawableRect.top + diameter);
-				arcOval = new RectF(mDrawableRect.right- diameter, mDrawableRect.top, mDrawableRect.right, mDrawableRect.top+ diameter);
-				path.arcTo(arcOval, 0, -90);
-				path.lineTo(mDrawableRect.left + diameter, mDrawableRect.top);
-				arcOval = new RectF(mDrawableRect.left, mDrawableRect.top, mDrawableRect.left+ diameter, mDrawableRect.top+ diameter);
-				path.arcTo(arcOval, 270, -90);
-
-
-
-
-
-//				path.addRect(mDrawableRect.left, mDrawableRect.top, mDrawableRect.right, mDrawableRect.bottom, Path.Direction.CW);
+			canvas.drawOval(mDrawableRect, mBitmapPaint);
+		}
+		else {
+			if( shouldDrawPath() ) {
+				Path path = generatePath();
 				canvas.drawPath(path, mBitmapPaint);
-//				canvas.drawRoundRect(mDrawableRect, Math.max(mCornerRadius - mBorderWidth, 0), Math.max(mCornerRadius - mBorderWidth, 0), mBitmapPaint);
+				if (mBorderWidth > 0) {
+					canvas.drawPath(path, mBorderPaint);
+				}
 			}
 			else {
-				canvas.drawRoundRect(mDrawableRect, mCornerRadius, mCornerRadius, mBitmapPaint);
+				if( mRoundCorners.contains(Corners.ALL) ) {
+					//XXX don't understand this
+					canvas.drawRoundRect(mDrawableRect, Math.max(mCornerRadius - mBorderWidth, 0), Math.max(mCornerRadius - mBorderWidth, 0), mBitmapPaint);
+					if (mBorderWidth > 0) {
+						canvas.drawRoundRect(mBorderRect, mCornerRadius, mCornerRadius, mBorderPaint);
+					}
+				}
+				else {
+					canvas.drawRect(mDrawableRect, mBitmapPaint);
+					if (mBorderWidth > 0) {
+						canvas.drawRect(mBorderRect, mBorderPaint);
+					}
+				}
 			}
 		}
+	}
+
+	private boolean shouldDrawPath() {
+		if( mRoundCorners.contains(Corners.ALL) ) {
+			return false;
+		}
+		else if( mRoundCorners.containsAll(EnumSet.of(Corners.BOTTOM_LEFT, Corners.BOTTOM_RIGHT, Corners.TOP_LEFT, Corners.TOP_RIGHT)) ) {
+			return false;
+		}
+		else if( mRoundCorners.size() == 1 && mRoundCorners.contains(Corners.NONE) ) {
+			return false;
+		}
+		return true;
+	}
+	private Path generatePath() {
+		Path path = new Path();
+
+		float diameter = mCornerRadius*2;
+
+		RectF arcOval;
+
+		//do top-left corner
+		if( mRoundCorners.contains(Corners.TOP_LEFT) ) {
+			arcOval = new RectF(mDrawableRect.left, mDrawableRect.top, mDrawableRect.left+ diameter, mDrawableRect.top+ diameter);
+			path.arcTo(arcOval, 270, -90);
+		}
+		else {
+			path.moveTo(mDrawableRect.left, mDrawableRect.top);
+		}
+
+		//do bottom-left corner
+		if( mRoundCorners.contains(Corners.BOTTOM_LEFT) ) {
+			arcOval = new RectF(mDrawableRect.left, mDrawableRect.bottom-diameter, mDrawableRect.left+diameter, mDrawableRect.bottom);
+			path.arcTo(arcOval, 180, -90);
+		}
+		else {
+			path.lineTo(mDrawableRect.left, mDrawableRect.bottom);
+		}
+
+		//do bottom-right corner
+		if( mRoundCorners.contains(Corners.BOTTOM_RIGHT) ) {
+			arcOval = new RectF(mDrawableRect.right-diameter, mDrawableRect.bottom-diameter, mDrawableRect.right, mDrawableRect.bottom);
+			path.arcTo(arcOval, 90, -90);
+		}
+		else {
+			path.lineTo(mDrawableRect.right, mDrawableRect.bottom);
+		}
+
+		//do top-right corner
+		if( mRoundCorners.contains(Corners.TOP_RIGHT) ) {
+			arcOval = new RectF(mDrawableRect.right-diameter, mDrawableRect.top, mDrawableRect.right, mDrawableRect.top+diameter);
+			path.arcTo(arcOval, 0, -90);
+		}
+		else {
+			path.lineTo(mDrawableRect.right, mDrawableRect.top);
+		}
+
+		//aaaand back to the top left
+		if( mRoundCorners.contains(Corners.TOP_LEFT) ) {
+			path.lineTo(mDrawableRect.left+mCornerRadius, mDrawableRect.top);
+		}
+		else {
+			path.lineTo(mDrawableRect.left, mDrawableRect.top);
+		}
+
+		/*
+		path.lineTo(mDrawableRect.left, mDrawableRect.bottom - diameter);
+		path.lineTo(mDrawableRect.right - diameter, mDrawableRect.bottom);
+		arcOval = new RectF(mDrawableRect.right- diameter, mDrawableRect.bottom- diameter, mDrawableRect.right, mDrawableRect.bottom);
+		path.arcTo(arcOval, 90, -90);
+		path.lineTo(mDrawableRect.right, mDrawableRect.top + diameter);
+		arcOval = new RectF(mDrawableRect.right- diameter, mDrawableRect.top, mDrawableRect.right, mDrawableRect.top+ diameter);
+		path.arcTo(arcOval, 0, -90);
+		path.lineTo(mDrawableRect.left + diameter, mDrawableRect.top);
+*/
+		return path;
 	}
 
 	@Override
