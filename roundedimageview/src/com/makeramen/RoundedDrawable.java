@@ -316,16 +316,6 @@ public class RoundedDrawable extends Drawable {
 			path.lineTo(mDrawableRect.left, mDrawableRect.top);
 		}
 
-		/*
-		path.lineTo(mDrawableRect.left, mDrawableRect.bottom - diameter);
-		path.lineTo(mDrawableRect.right - diameter, mDrawableRect.bottom);
-		arcOval = new RectF(mDrawableRect.right- diameter, mDrawableRect.bottom- diameter, mDrawableRect.right, mDrawableRect.bottom);
-		path.arcTo(arcOval, 90, -90);
-		path.lineTo(mDrawableRect.right, mDrawableRect.top + diameter);
-		arcOval = new RectF(mDrawableRect.right- diameter, mDrawableRect.top, mDrawableRect.right, mDrawableRect.top+ diameter);
-		path.arcTo(arcOval, 0, -90);
-		path.lineTo(mDrawableRect.left + diameter, mDrawableRect.top);
-*/
 		return path;
 	}
 
