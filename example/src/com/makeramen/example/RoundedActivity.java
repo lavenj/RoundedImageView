@@ -84,6 +84,7 @@ public class RoundedActivity extends Activity {
 
 			if( position == 0 ) {
 				imageView.setRoundCorners(EnumSet.of(RoundedDrawable.Corners.TOP_LEFT));
+				imageView.setBorderWidth(0);
 			}
 			else if( position == 1 ) {
 				imageView.setRoundCorners(EnumSet.of(RoundedDrawable.Corners.TOP_LEFT, RoundedDrawable.Corners.BOTTOM_RIGHT));
@@ -93,6 +94,7 @@ public class RoundedActivity extends Activity {
 			}
 			else if( position == 3 ) {
 				imageView.setRoundCorners(EnumSet.of(RoundedDrawable.Corners.BOTTOM_LEFT, RoundedDrawable.Corners.TOP_RIGHT));
+				imageView.setBorderWidth(0);
 			}
 			else {
 				imageView.setRoundCorners(EnumSet.of(RoundedDrawable.Corners.ALL));
